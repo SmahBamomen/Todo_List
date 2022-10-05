@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:intl/intl.dart';
 class AddTask extends StatefulWidget {
   const AddTask({Key? key}) : super(key: key);
 
@@ -8,12 +8,15 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+   DateTime newDate = DateTime.now();
+   var formatterDate ;
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
 
       title: Center(child: Text("To Do List")),
       content: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Task Name :'),
@@ -27,24 +30,36 @@ class _AddTaskState extends State<AddTask> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text('Date :'),
-              IconButton(onPressed: () =>
+              IconButton(onPressed: () async =>
               {
                 showDialog(
                     context: context,
                     builder: (context) =>
-                        DatePickerDialog(initialDate: DateTime(2023,10,4), firstDate: DateTime(2023), lastDate: DateTime(2024))
-                )
+                        DatePickerDialog(
+                            initialDate: DateTime(2023,10,4),
+                            firstDate: DateTime(2023),
+                            lastDate: DateTime(2024))
+                ).then((value) => {
+                        setState((){
+                          newDate = value;
+                          formatterDate = DateFormat('yyyy-MM-dd').format(newDate);
+                        })
+                })
+
               },
                 icon: Icon(Icons.date_range_sharp),)
             ],
-          )
-
+          ),
+          Text(formatterDate == null ? '' : formatterDate.toString())
 
 
         ],
       ),
 
       actions: [
+        TextButton(onPressed: (){
+          Navigator.of(context).pop();
+        }, child: Text('Cancel')),
         TextButton(onPressed: addToDo, child: Text('Add'))
       ],
     );
