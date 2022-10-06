@@ -1,8 +1,9 @@
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_list/constants/colors.dart';
-import 'package:intl/intl.dart';
+import 'package:todo_list/screens/add_task.dart';
+import 'package:todo_list/screens/today.dart';
+import 'package:todo_list/screens/tomorrow.dart';
+import 'package:todo_list/screens/upcoming.dart';
 
 class AllTask extends StatefulWidget {
   const AllTask({Key? key}) : super(key: key);
@@ -12,115 +13,63 @@ class AllTask extends StatefulWidget {
 }
 
 class _AllTaskState extends State<AllTask> {
-  bool todoDone = false;
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection("tasks").snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Text('OPS ! ');
-        } else if (snapshot.hasData || snapshot.data != null) {
+    return SingleChildScrollView(
+      child: Column(
+         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            height: 100,
 
-          return ListView.builder(
-              shrinkWrap: true,
-              itemCount: snapshot.data?.docs.length,
-              itemBuilder: (BuildContext context, int index) {
-
-
-                if( DateFormat('yyyy-MM-dd').format(DateTime.now()) == DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(
-                  snapshot.data!.docs[index].data()["date"].millisecondsSinceEpoch,
-                  isUtc: false,
-                ).toUtc()).toString()){
-                  return Dismissible(
-                      key: Key(index.toString()),
-                      child: Card(
-                        elevation: 1,
-                        child: Container(
-                          margin: EdgeInsets.only(bottom: 5),
-                          child: ListTile(
-                            onTap: () {
-
-                              setState(() {
-
-                                if  ( snapshot.data!.docs[index].data()["isDone"] == false ){
-                                  DocumentReference documentReference =
-                                  FirebaseFirestore.instance.collection("tasks").doc(snapshot.data!.docs[index].id);
-                                  documentReference.update({"isDone": true});
-                                }
-                                else {
-                                  DocumentReference documentReference =
-                                  FirebaseFirestore.instance.collection("tasks").doc(snapshot.data!.docs[index].id);
-                                  documentReference.update({"isDone": false});
-                                }
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Text(
+                  'Today 🥳',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
+                ),
+                SizedBox(width: 230),
+                SizedBox(
+                  height: 40.0,
+                  width: 40.0,
+                  child: FittedBox(
+                    child: FloatingActionButton(
 
 
-                              });
-
-                            },
-
-                            contentPadding: EdgeInsets.symmetric(horizontal: 20),
-                            tileColor: Colors.white,
-                            leading: Icon(
-                                snapshot.data!.docs[index].data()["isDone"] ? Icons.check_box : Icons.check_box_outline_blank,
-                                color: colorLightGreen
-                            ),
-                            title: Text(
-                              (snapshot.data!.docs[index].data()["name"] != null)
-                                  ? snapshot.data!.docs[index].data()["name"]
-                                  : "",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: colorBlack,
-                                decoration: snapshot.data!.docs[index].data()["isDone"] ? TextDecoration.lineThrough : null,
-                              ),
-                            ),
-                            trailing: Container(
-                              padding: EdgeInsets.all(0),
-                              margin: EdgeInsets.symmetric(vertical: 12),
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: colorRed,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: IconButton(
-                                color: colorWhite,
-                                iconSize: 18,
-                                icon: Icon(Icons.delete),
-                                onPressed: () {
-
-                                  DocumentReference documentReference =
-                                  FirebaseFirestore.instance.collection("tasks").doc(snapshot.data!.docs[index].id);
-                                  documentReference.delete().whenComplete(() => print("deleted successfully"));
-
-
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ));
-                }
-
-
-
-                else{
-return Container();
-                }
-                }
-             
-
-              );
-        }
-        return const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(
-              colorLightGreen,
+                      onPressed: openAddDialog,
+                      child: const Icon(Icons.add,size: 25,),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        );
-      },
+          TodayTasks(),
+          Padding(
+            padding:  EdgeInsets.only(bottom:10, left: 20),
+            child: const Text(
+              'Tomorrow ✨',
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
+            ),
+          ),
+          TomorrowTasks(),
+          Padding(
+            padding:  EdgeInsets.only(bottom:10, left: 20),
+            child:  const Text(
+              'Upcoming 🤩',
+              style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
+            ),
+
+          ),
+          UpcomingTasks()
+        ],
+      ),
     );
 
   }
+  Future openAddDialog() =>
+      showDialog(context: context, builder: (context) => AddTask());
 }

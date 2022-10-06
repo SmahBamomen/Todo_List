@@ -4,6 +4,9 @@ import 'package:todo_list/screens/all_tasks.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:todo_list/firebase_options.dart';
+import 'package:todo_list/screens/today.dart';
+import 'package:todo_list/screens/tomorrow.dart';
+import 'package:todo_list/screens/upcoming.dart';
 import 'package:todo_list/splash.dart';
 
 void main() async {
@@ -26,7 +29,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.amber,
       ),
       home: Splash(),
-      // home: const MyHomePage(title: 'All Task'),
+
     );
   }
 }
@@ -47,59 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Text(
-                    'Today 🥳',
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
-                  ),
-                  SizedBox(width: 230),
-                  SizedBox(
-                    height: 40.0,
-                    width: 40.0,
-                    child: FittedBox(
-                      child: FloatingActionButton(
-
-
-                        onPressed: openDialog,
-                        child: const Icon(Icons.add,size: 25,),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            AllTask(),
-            Container(
-              height: 100,
-              padding: EdgeInsets.only(left: 20),
-              child:  const Text(
-                'Tomorrow ✨',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
-              ),
-            ),
-            Container(
-              height: 100,
-              padding: EdgeInsets.only(left: 20),
-              child:  const Text(
-                'Upcoming 🤩',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20),
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: AllTask(),
     );
   }
 
-  Future openDialog() =>
-      showDialog(context: context, builder: (context) => AddTask());
+
 }
