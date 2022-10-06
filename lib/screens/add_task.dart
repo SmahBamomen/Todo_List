@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 class AddTask extends StatefulWidget {
   const AddTask({Key? key}) : super(key: key);
 
@@ -8,6 +9,7 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+  TextEditingController taskNameController = new TextEditingController();
    DateTime newDate = DateTime.now();
    var formatterDate ;
   @override
@@ -21,6 +23,7 @@ class _AddTaskState extends State<AddTask> {
         children: [
           Text('Task Name :'),
           TextField(
+            controller: taskNameController,
             autofocus: true,
             decoration: InputDecoration(hintText: 'Enter the Name of Task :'),
 
@@ -66,6 +69,9 @@ class _AddTaskState extends State<AddTask> {
   }
 
   void addToDo(){
+    FirebaseFirestore.instance
+        .collection('tasks')
+        .add({'name':taskNameController.text,'date': newDate,'isDone':false });
     Navigator.of(context).pop();
   }
 }
