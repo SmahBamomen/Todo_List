@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:todo_list/screens/add_task.dart';
 import 'package:todo_list/screens/all_tasks.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import 'package:todo_list/firebase_options.dart';
-import 'package:todo_list/screens/today.dart';
-import 'package:todo_list/screens/tomorrow.dart';
-import 'package:todo_list/screens/upcoming.dart';
 import 'package:todo_list/splash.dart';
 
 void main() async {

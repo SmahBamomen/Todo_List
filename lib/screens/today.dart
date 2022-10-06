@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list/constants/colors.dart';
 import 'package:intl/intl.dart';
-import 'package:todo_list/screens/delete_task.dart';
-
+import 'package:todo_list/screens/add_task.dart';
 class TodayTasks extends StatefulWidget {
   const TodayTasks({Key? key}) : super(key: key);
 
@@ -12,6 +11,11 @@ class TodayTasks extends StatefulWidget {
 }
 
 class _TodayTasksState extends State<TodayTasks> {
+  TextEditingController taskNameController = new TextEditingController();
+  DateTime newDate = DateTime.now();
+  var formatterDate ;
+  String errorText = '';
+  var errorIcon;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
@@ -25,7 +29,6 @@ class _TodayTasksState extends State<TodayTasks> {
               shrinkWrap: true,
               itemCount: snapshot.data?.docs.length,
               itemBuilder: (BuildContext context, int index) {
-
 
                 if( DateFormat('yyyy-MM-dd').format(DateTime.now()) == DateFormat('yyyy-MM-dd').format(DateTime.fromMillisecondsSinceEpoch(
                   snapshot.data!.docs[index].data()["date"].millisecondsSinceEpoch,
@@ -53,11 +56,9 @@ class _TodayTasksState extends State<TodayTasks> {
                                   documentReference.update({"isDone": false});
                                 }
 
-
                               });
 
                             },
-
                             contentPadding: EdgeInsets.symmetric(horizontal: 20),
                             tileColor: Colors.white,
                             leading: Icon(
@@ -74,38 +75,99 @@ class _TodayTasksState extends State<TodayTasks> {
                                 decoration: snapshot.data!.docs[index].data()["isDone"] ? TextDecoration.lineThrough : null,
                               ),
                             ),
-                            trailing: Container(
-                              padding: EdgeInsets.all(0),
-                              margin: EdgeInsets.symmetric(vertical: 12),
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: colorRed,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: IconButton(
-                                color: colorWhite,
-                                iconSize: 18,
-                                icon: Icon(Icons.delete),
-                                onPressed: (){
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(0),
+                                  margin: EdgeInsets.symmetric(vertical: 12),
+                                  width: 35,
+                                  decoration: BoxDecoration(
+                                    color: colorBlack,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: IconButton(
+                                    color: colorWhite,
+                                    iconSize: 18,
+                                    icon: Icon(Icons.edit),
+                                    onPressed: (){
 
-                                      showDialog(context: context, builder: (context) =>   AlertDialog(
-                                        title: Text('Alert !! 🚨',style: TextStyle(color: colorRed)),
-                                        content: Text('Are you sure to delete the task ? ',style: TextStyle(color: colorLightGreen)),
+                                      showDialog(context: context,
+                                          barrierDismissible: true,
+                                          builder: (BuildContext cxt) {
+                                            return AlertDialog(
 
-                                        actions: [
-                                          TextButton(onPressed: (){
-                                            Navigator.of(context).pop();
-                                          }, child: Text('No',style: TextStyle(color: colorGrey),)),
-                                          TextButton(onPressed: (){
-                                            DocumentReference documentReference =
-                                            FirebaseFirestore.instance.collection("tasks").doc(snapshot.data!.docs[index].id);
-                                            documentReference.delete().whenComplete(() => print("deleted successfully"));
-                                            Navigator.of(context).pop();
-                                          }, child: Text('Yes'))
-                                        ],
-                                      ));
-                                },
-                              ),
+                                              title: Center(child: Text("To Do List",style: TextStyle(fontWeight: FontWeight.w600,color: colorBlack),)),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('Task Name :',style: TextStyle(fontWeight: FontWeight.w600,color: colorLightGreen),),
+                                                  TextField(
+                                                    controller: taskNameController,
+
+                                                    autofocus: true,
+                                                    decoration: InputDecoration(hintText: snapshot.data!.docs[index].data()["name"],hintStyle: TextStyle(fontSize: 10)),
+
+                                                  ),
+
+
+                                                ],
+                                              ),
+
+                                              actions: [
+                                                TextButton(onPressed: (){
+                                                  Navigator.of(context).pop();
+                                                }, child: Text('Cancel',style: TextStyle(color: colorGrey),)),
+                                                TextButton(onPressed: (){
+
+                                                  DocumentReference documentReference =
+                                                  FirebaseFirestore.instance.collection("tasks").doc(snapshot.data!.docs[index].id);
+                                                  documentReference.update({"name": taskNameController.text});
+                                                  Navigator.of(context).pop();
+                                                }, child: Text('Edit'))
+                                              ],
+                                            );;
+                                          });
+
+                                    },
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Container(
+                                  padding: EdgeInsets.all(0),
+                                  margin: EdgeInsets.symmetric(vertical: 12),
+                                  width: 35,
+                                  decoration: BoxDecoration(
+                                    color: colorRed,
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                  child: IconButton(
+                                    color: colorWhite,
+                                    iconSize: 18,
+                                    icon: Icon(Icons.delete),
+                                    onPressed: (){
+
+                                          showDialog(context: context, builder: (context) =>   AlertDialog(
+                                            title: Text('Alert !! 🚨',style: TextStyle(color: colorRed)),
+                                            content: Text('Are you sure to delete the task ? ',style: TextStyle(color: colorLightGreen)),
+
+                                            actions: [
+                                              TextButton(onPressed: (){
+                                                Navigator.of(context).pop();
+                                              }, child: Text('No',style: TextStyle(color: colorGrey),)),
+                                              TextButton(onPressed: (){
+                                                DocumentReference documentReference =
+                                                FirebaseFirestore.instance.collection("tasks").doc(snapshot.data!.docs[index].id);
+                                                documentReference.delete().whenComplete(() => print("deleted successfully"));
+                                                Navigator.of(context).pop();
+                                              }, child: Text('Yes'))
+                                            ],
+                                          ));
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -134,5 +196,6 @@ class _TodayTasksState extends State<TodayTasks> {
 
     );
   }
-
+  Future openAddDialog() =>
+      showDialog(context: context, builder: (context) => AddTask());
 }
